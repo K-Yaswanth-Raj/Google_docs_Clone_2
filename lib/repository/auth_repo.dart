@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:google_docs_clone/constants.dart';
+import 'package:google_docs_clone/model/error_model.dart';
 import 'package:http/http.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_docs_clone/model/user_model.dart';
@@ -10,6 +11,8 @@ final authRepoProvider = Provider<AuthRepo>((ref) {
   return AuthRepo(googleSignIn: GoogleSignIn(), client: Client());
 });
 
+final useProvider = StateProvider<UserModel?>((ref) => null);
+
 class AuthRepo {
   final GoogleSignIn _googleSignIn;
   final Client _client;
@@ -17,7 +20,8 @@ class AuthRepo {
       : _googleSignIn = googleSignIn,
         _client = client;
 
-  void signInWithGoogle() async {
+  Future<ErrorModel> signInWithGoogle() async {
+    ErrorModel error = ErrorModel(error: 'Some Error has Occured', data: null);
     try {
       final user = await _googleSignIn.signIn();
       if (user != null) {
@@ -34,12 +38,13 @@ class AuthRepo {
             final newUser = userAcc.copyWith(
               uid: jsonDecode(res.body)['user']['_id'],
             );
+            error = ErrorModel(error: null, data: newUser);
             break;
-          
         }
       }
     } catch (e) {
-      print(e);
+      error = ErrorModel(error: e.toString(), data: null);
     }
+    return error;
   }
 }
