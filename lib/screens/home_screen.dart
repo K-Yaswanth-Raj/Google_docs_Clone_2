@@ -6,6 +6,11 @@ import 'package:google_docs_clone/repository/auth_repo.dart';
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
+  void signOut(WidgetRef ref ){
+    ref.read(authRepoProvider).signOut();
+    ref.read(useProvider.notifier).update((state) => null);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return SafeArea(
@@ -19,7 +24,9 @@ class HomeScreen extends ConsumerWidget {
           ),
         ),
         IconButton(
-          onPressed: () {},
+          onPressed: () {
+             return signOut(ref);
+          },
           icon: Icon(
             Icons.logout,
             color: KRedColor,
