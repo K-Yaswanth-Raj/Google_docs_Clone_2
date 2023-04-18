@@ -1,7 +1,7 @@
 const express = require('express');
 const Document = require('../models/document');
 const documentRouter = express.Router();
-const auth = require('../middleware/auth')
+const auth = require('../middleware/auth');
 
 documentRouter.post('/doc/create',auth, async (req,res) => {
     try{
@@ -15,7 +15,7 @@ documentRouter.post('/doc/create',auth, async (req,res) => {
         document = await document.save();
         res.json(document);
 
-    } catch (e){
+    } catch (e) {
         res.status(500).json({error : e.message});
     }
 });
