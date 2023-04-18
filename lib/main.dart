@@ -29,7 +29,7 @@ class _MyAppState extends ConsumerState<MyApp> {
   void getUserData() async {
     errorModel = await ref.read(authRepoProvider).getUserData();
     if (errorModel != null && errorModel!.data != null) {
-      ref.read(useProvider.notifier).update((state) => errorModel!.data);
+      ref.read(userProvider.notifier).update((state) => errorModel!.data);
     }
   }
 
@@ -40,7 +40,7 @@ class _MyAppState extends ConsumerState<MyApp> {
       theme: ThemeData(useMaterial3: true),
       debugShowCheckedModeBanner: false,
       routerDelegate: RoutemasterDelegate(routesBuilder: (context) {
-    final user = ref.watch(useProvider);
+    final user = ref.watch(userProvider);
         if(user!=null && user.token.isNotEmpty){
           return loggedInRoute;
         }else{

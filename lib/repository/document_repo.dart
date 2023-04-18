@@ -1,10 +1,8 @@
 import 'dart:convert';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_docs_clone/model/docu_model.dart';
 import 'package:http/http.dart';
 import 'package:google_docs_clone/model/error_model.dart';
-
 import '../constants.dart';
 
 final documentProvider = Provider<DocumentRepository>((ref) {
@@ -33,6 +31,38 @@ class DocumentRepository {
           error = ErrorModel(
             error: null,
             data: DocumentModel.fromJson(res.body),
+          );
+          break;
+        default:
+          error = ErrorModel(error: res.body, data: null);
+          break;
+      }
+    } catch (e) {
+      error = ErrorModel(error: e.toString(), data: null);
+    }
+    return error;
+  }
+
+  Future<ErrorModel> getDocument(String token) async {
+    ErrorModel error = ErrorModel(error: 'Some Error has Occured', data: null);
+    try {
+      var res = await _client.get(
+        Uri.parse('$host/doc/me'),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'x-auth-token': token,
+        },
+      );
+      switch (res.statusCode) {
+        case 200:
+          List<DocumentModel> documents = [];
+          for (int i = 0; i < jsonDecode(res.body).length; i++) {
+            documents.add(
+                DocumentModel.fromJson(jsonEncode(jsonDecode(res.body)[i])));
+          }
+          error = ErrorModel(
+            error: null,
+            data: documents,
           );
           break;
         default:

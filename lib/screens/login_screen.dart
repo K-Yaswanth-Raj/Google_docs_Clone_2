@@ -13,7 +13,7 @@ class LoginScreen extends ConsumerWidget {
     final errorModel = await ref.read(authRepoProvider).signInWithGoogle();
     final navigator = Routemaster.of(context);
     if (errorModel.error == null) {
-      ref.read(useProvider.notifier).update((state) => errorModel.data);
+      ref.read(userProvider.notifier).update((state) => errorModel.data);
       navigator.replace('/');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

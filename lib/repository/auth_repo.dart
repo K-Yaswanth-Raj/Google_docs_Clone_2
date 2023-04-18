@@ -15,7 +15,7 @@ final authRepoProvider = Provider<AuthRepo>((ref) {
       localStorageRepository: LocalStorageRepository());
 });
 
-final useProvider = StateProvider<UserModel?>((ref) => null);
+final userProvider = StateProvider<UserModel?>((ref) => null);
 
 class AuthRepo {
   final GoogleSignIn _googleSignIn;
