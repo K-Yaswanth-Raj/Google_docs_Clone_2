@@ -33,6 +33,7 @@ class HomeScreen extends ConsumerWidget {
       );
     }
   }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return SafeArea(
@@ -57,32 +58,42 @@ class HomeScreen extends ConsumerWidget {
             ),
           ),
         ]),
-        body: FutureBuilder(
-          future: ref
-              .watch(documentProvider)
-              .getDocument(ref.watch(userProvider)!.token),
+        body: FutureBuilder<ErrorModel>(
+          future: ref.watch(documentProvider).getDocument(
+                ref.watch(userProvider)!.token,
+              ),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Loader();
-            } 
-              return ListView.builder(
+              return const Loader();
+            }
+
+            return Center(
+                child: Container(
+              width: 600,
+              margin: const EdgeInsets.only(top: 10),
+              child: ListView.builder(
                 itemCount: snapshot.data!.data.length,
-                itemBuilder: (BuildContext context, int index) {
+                itemBuilder: (context, index) {
                   DocumentModel document = snapshot.data!.data[index];
-                  print(document);
-                  return SafeArea(
-                    child: Card(
-                      child: Center(
-                        child: Text(
-                          document.title,
-                          style: TextStyle(fontSize: 17),
+                  return InkWell(
+                    onTap: () => null,
+                    child: SizedBox(
+                      height: 50,
+                      child: Card(
+                        child: Center(
+                          child: Text(
+                            document.title,
+                            style: const TextStyle(
+                              fontSize: 17,
+                            ),
+                          ),
                         ),
                       ),
                     ),
                   );
                 },
-              );
-            
+              ),
+            ));
           },
         ),
       ),
