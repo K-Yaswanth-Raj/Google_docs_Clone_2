@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_docs_clone/colors.dart';
+import 'package:google_docs_clone/model/docu_model.dart';
+import 'package:google_docs_clone/model/error_model.dart';
+import 'package:google_docs_clone/repository/auth_repo.dart';
+import 'package:google_docs_clone/repository/document_repo.dart';
 
 class DocumentScreen extends ConsumerStatefulWidget {
   final String id;
@@ -15,10 +19,38 @@ class _DocumentScreenState extends ConsumerState<DocumentScreen> {
   TextEditingController titleController =
       TextEditingController(text: 'Untitled Document');
   final quill.QuillController _controller = quill.QuillController.basic();
+  ErrorModel? errorModel;
+  @override
+  void initState() {
+    super.initState();
+    fetchDocumentData();
+  }
+
+  void fetchDocumentData() async {
+   errorModel = await ref
+        .read(documentProvider)
+        .getDocumentById(ref.read(userProvider)!.token, widget.id);
+
+        if(errorModel!.data != null){
+          titleController.text = (errorModel!.data as DocumentModel).title;
+          setState(() {
+            
+          });
+        }
+  }
+
   @override
   void dispose() {
     super.dispose();
     titleController.dispose();
+  }
+
+  void updateTitle(WidgetRef ref, String title) {
+    ref.read(documentProvider).updateTitle(
+          token: ref.read(userProvider)!.token,
+          title: title,
+          id: widget.id,
+        );
   }
 
   @override
@@ -74,6 +106,9 @@ class _DocumentScreenState extends ConsumerState<DocumentScreen> {
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.only(left: 10),
                     ),
+                    onSubmitted: (value) {
+                      return updateTitle(ref, value);
+                    },
                   ),
                 )
               ],
