@@ -6,6 +6,7 @@ import 'package:google_docs_clone/model/docu_model.dart';
 import 'package:google_docs_clone/model/error_model.dart';
 import 'package:google_docs_clone/repository/auth_repo.dart';
 import 'package:google_docs_clone/repository/document_repo.dart';
+import 'package:google_docs_clone/repository/socket_repo.dart';
 
 class DocumentScreen extends ConsumerStatefulWidget {
   final String id;
@@ -20,23 +21,23 @@ class _DocumentScreenState extends ConsumerState<DocumentScreen> {
       TextEditingController(text: 'Untitled Document');
   final quill.QuillController _controller = quill.QuillController.basic();
   ErrorModel? errorModel;
+  SocketRepository socketRepo = SocketRepository();
   @override
   void initState() {
     super.initState();
+    socketRepo.joinRoom(widget.id);
     fetchDocumentData();
   }
 
   void fetchDocumentData() async {
-   errorModel = await ref
+    errorModel = await ref
         .read(documentProvider)
         .getDocumentById(ref.read(userProvider)!.token, widget.id);
 
-        if(errorModel!.data != null){
-          titleController.text = (errorModel!.data as DocumentModel).title;
-          setState(() {
-            
-          });
-        }
+    if (errorModel!.data != null) {
+      titleController.text = (errorModel!.data as DocumentModel).title;
+      setState(() {});
+    }
   }
 
   @override
