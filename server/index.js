@@ -30,8 +30,11 @@ mongoose.connect(DB).then(() => {
 
 io.on("connection", (socket) => {
     socket.on('join', (documentId) => {
-      socket.join(documentId);
-      console.log('joined');
+        socket.join(documentId);
+        console.log('joined');
+    });
+    socket.on('typing',(data) => {
+        socket.broadcast.to(data.room).emit('changes',data);
     });
 });
 
