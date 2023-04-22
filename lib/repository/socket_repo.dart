@@ -1,3 +1,4 @@
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:google_docs_clone/clients/socket_client.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 
@@ -16,5 +17,9 @@ class SocketRepository {
 
   void changeListener(Function(Map<String,dynamic>) func) {
     _socketClient.on('changes', (data) => func(data));
+  }
+
+  void autoSave(Map<String, dynamic> data) {
+    _socketClient.emit('save', data);
   }
 }

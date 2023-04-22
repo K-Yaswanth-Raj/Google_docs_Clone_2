@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,6 +10,7 @@ import 'package:google_docs_clone/model/error_model.dart';
 import 'package:google_docs_clone/repository/auth_repo.dart';
 import 'package:google_docs_clone/repository/document_repo.dart';
 import 'package:google_docs_clone/repository/socket_repo.dart';
+import 'package:routemaster/routemaster.dart';
 
 class DocumentScreen extends ConsumerStatefulWidget {
   final String id;
@@ -34,6 +37,12 @@ class _DocumentScreenState extends ConsumerState<DocumentScreen> {
           _controller?.selection ?? TextSelection.collapsed(offset: 0),
           quill.ChangeSource.REMOTE);
     });
+    Timer.periodic(const Duration(seconds: 2), (timer) {
+      socketRepo.autoSave(<String, dynamic>{
+        'delta': _controller!.document.toDelta(),
+        'room': widget.id,
+      });
+    });
   }
 
   void fetchDocumentData() async {
@@ -53,14 +62,13 @@ class _DocumentScreenState extends ConsumerState<DocumentScreen> {
       setState(() {});
     }
     _controller!.document.changes.listen((event) {
-      if(event.source == quill.ChangeSource.LOCAL){
-        Map<String,dynamic> map = {
-          'delta': event.change,
-          'room': widget.id
-        };
+      if (event.source == quill.ChangeSource.LOCAL) {
+        Map<String, dynamic> map = {'delta': event.change, 'room': widget.id};
         socketRepo.typing(map);
       }
-     });
+    });
+
+    
   }
 
   @override
@@ -117,9 +125,14 @@ class _DocumentScreenState extends ConsumerState<DocumentScreen> {
             padding: const EdgeInsets.symmetric(vertical: 9.0),
             child: Row(
               children: [
-                Image.asset(
-                  'assets/images/docs-logo.png',
-                  height: 40,
+                GestureDetector(
+                  onTap: () {
+                    Routemaster.of(context).replace('/');
+                  },
+                  child: Image.asset(
+                    'assets/images/docs-logo.png',
+                    height: 40,
+                  ),
                 ),
                 SizedBox(
                   width: 10,

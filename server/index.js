@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const authRouter = require('./routes/auth');
 const cors = require('cors');
 const http = require('http');
-
+const Document = require("./models/document");
 const documentRouter = require('./routes/document');
 
 const PORT = process.env.PORT | 3001;
@@ -33,11 +33,21 @@ io.on("connection", (socket) => {
         socket.join(documentId);
         console.log('joined');
     });
-    socket.on('typing',(data) => {
-        socket.broadcast.to(data.room).emit('changes',data);
+    socket.on('typing', (data) => {
+        socket.broadcast.to(data.room).emit('changes', data);
+    });
+
+    socket.on("save", (data) => {
+        saveData(data);
     });
 });
 
+
+const saveData = async (data) => {
+    let document = await Document.findById(data.room);
+    document.content = data.delta;
+    document = await document.save();
+};
 server.listen(PORT, '0.0.0.0', () => {
     console.log(`Connected at port ${PORT}`);
 });
